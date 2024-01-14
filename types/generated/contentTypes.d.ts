@@ -768,6 +768,174 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
+export interface ApiAppUserAppUser extends Schema.CollectionType {
+  collectionName: 'app_users';
+  info: {
+    singularName: 'app-user';
+    pluralName: 'app-users';
+    displayName: 'appUser';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    first_name: Attribute.String & Attribute.Required;
+    last_name: Attribute.String & Attribute.Required;
+    email: Attribute.Email & Attribute.Required;
+    password: Attribute.Password & Attribute.Required;
+    address: Attribute.String;
+    city: Attribute.String;
+    state: Attribute.String;
+    country: Attribute.String;
+    phone_number: Attribute.String;
+    role: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::app-user.app-user',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::app-user.app-user',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiArtistArtist extends Schema.CollectionType {
+  collectionName: 'artists';
+  info: {
+    singularName: 'artist';
+    pluralName: 'artists';
+    displayName: 'Artist';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    artist_id: Attribute.Integer & Attribute.Required;
+    name: Attribute.String & Attribute.Required;
+    genre: Attribute.String;
+    bio: Attribute.Blocks & Attribute.Required;
+    image: Attribute.Media;
+    website: Attribute.String;
+    socialMediaLinks: Attribute.String;
+    concert_id: Attribute.Relation<
+      'api::artist.artist',
+      'manyToOne',
+      'api::concert.concert'
+    >;
+    ticket: Attribute.Relation<
+      'api::artist.artist',
+      'oneToOne',
+      'api::ticket.ticket'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::artist.artist',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::artist.artist',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiConcertConcert extends Schema.CollectionType {
+  collectionName: 'concerts';
+  info: {
+    singularName: 'concert';
+    pluralName: 'concerts';
+    displayName: 'Concert';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String & Attribute.Required;
+    date: Attribute.Date & Attribute.Required;
+    time: Attribute.Time;
+    venue: Attribute.String & Attribute.Required;
+    state: Attribute.String;
+    country: Attribute.String & Attribute.Required;
+    genre: Attribute.String;
+    description: Attribute.Blocks & Attribute.Required;
+    avatar: Attribute.Media;
+    coverPhoto: Attribute.Media;
+    artist_id: Attribute.Integer;
+    status: Attribute.String;
+    artist_ids: Attribute.Relation<
+      'api::concert.concert',
+      'oneToMany',
+      'api::artist.artist'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::concert.concert',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::concert.concert',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTicketTicket extends Schema.CollectionType {
+  collectionName: 'tickets';
+  info: {
+    singularName: 'ticket';
+    pluralName: 'tickets';
+    displayName: 'Ticket';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    artist: Attribute.Relation<
+      'api::ticket.ticket',
+      'oneToOne',
+      'api::artist.artist'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::ticket.ticket',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::ticket.ticket',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -786,6 +954,10 @@ declare module '@strapi/types' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
+      'api::app-user.app-user': ApiAppUserAppUser;
+      'api::artist.artist': ApiArtistArtist;
+      'api::concert.concert': ApiConcertConcert;
+      'api::ticket.ticket': ApiTicketTicket;
     }
   }
 }
