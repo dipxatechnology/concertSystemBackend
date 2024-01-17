@@ -4,7 +4,8 @@
   "info": {
     "singularName": "app-user",
     "pluralName": "app-users",
-    "displayName": "appUser"
+    "displayName": "appUser",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -43,7 +44,35 @@
       "type": "string"
     },
     "role": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "user",
+        "visitor"
+      ]
+    },
+    "tickets": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ticket.ticket",
+      "mappedBy": "app_users"
+    },
+    "orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order.order",
+      "mappedBy": "app_user"
+    },
+    "feedbacks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::feedback.feedback",
+      "mappedBy": "app_user"
+    },
+    "wishlists": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::wishlist.wishlist",
+      "mappedBy": "app_user"
     }
   }
 }

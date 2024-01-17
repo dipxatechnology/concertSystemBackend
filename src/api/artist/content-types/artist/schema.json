@@ -12,10 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "artist_id": {
-      "type": "integer",
-      "required": true
-    },
     "name": {
       "type": "string",
       "required": true
@@ -27,15 +23,12 @@
       "type": "blocks",
       "required": true
     },
-    "image": {
+    "avatar": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
     },
     "website": {
@@ -44,17 +37,11 @@
     "socialMediaLinks": {
       "type": "string"
     },
-    "concert_id": {
+    "concerts": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::concert.concert",
-      "inversedBy": "artist_ids"
-    },
-    "ticket": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::ticket.ticket",
-      "mappedBy": "artist"
+      "mappedBy": "artists"
     }
   }
 }

@@ -33,24 +33,21 @@
     },
     "country": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "genre": {
       "type": "string"
     },
     "description": {
       "type": "blocks",
-      "required": true
+      "required": false
     },
     "avatar": {
       "type": "media",
       "multiple": false,
-      "required": false,
+      "required": true,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
     },
     "coverPhoto": {
@@ -58,23 +55,35 @@
       "multiple": false,
       "required": false,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
     },
-    "artist_id": {
-      "type": "integer"
-    },
     "status": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "open",
+        "closed",
+        "delayed "
+      ],
+      "required": true
     },
-    "artist_ids": {
+    "artists": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::artist.artist",
+      "inversedBy": "concerts"
+    },
+    "tickets": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::artist.artist",
-      "mappedBy": "concert_id"
+      "target": "api::ticket.ticket",
+      "mappedBy": "concert"
+    },
+    "wishlists": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::wishlist.wishlist",
+      "mappedBy": "concert"
     }
   }
 }

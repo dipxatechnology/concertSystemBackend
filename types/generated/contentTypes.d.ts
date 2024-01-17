@@ -774,6 +774,7 @@ export interface ApiAppUserAppUser extends Schema.CollectionType {
     singularName: 'app-user';
     pluralName: 'app-users';
     displayName: 'appUser';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -788,7 +789,27 @@ export interface ApiAppUserAppUser extends Schema.CollectionType {
     state: Attribute.String;
     country: Attribute.String;
     phone_number: Attribute.String;
-    role: Attribute.String;
+    role: Attribute.Enumeration<['user', 'visitor']>;
+    tickets: Attribute.Relation<
+      'api::app-user.app-user',
+      'manyToMany',
+      'api::ticket.ticket'
+    >;
+    orders: Attribute.Relation<
+      'api::app-user.app-user',
+      'oneToMany',
+      'api::order.order'
+    >;
+    feedbacks: Attribute.Relation<
+      'api::app-user.app-user',
+      'oneToMany',
+      'api::feedback.feedback'
+    >;
+    wishlists: Attribute.Relation<
+      'api::app-user.app-user',
+      'oneToMany',
+      'api::wishlist.wishlist'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -819,22 +840,16 @@ export interface ApiArtistArtist extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    artist_id: Attribute.Integer & Attribute.Required;
     name: Attribute.String & Attribute.Required;
     genre: Attribute.String;
     bio: Attribute.Blocks & Attribute.Required;
-    image: Attribute.Media;
+    avatar: Attribute.Media;
     website: Attribute.String;
     socialMediaLinks: Attribute.String;
-    concert_id: Attribute.Relation<
+    concerts: Attribute.Relation<
       'api::artist.artist',
-      'manyToOne',
+      'manyToMany',
       'api::concert.concert'
-    >;
-    ticket: Attribute.Relation<
-      'api::artist.artist',
-      'oneToOne',
-      'api::ticket.ticket'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -871,17 +886,27 @@ export interface ApiConcertConcert extends Schema.CollectionType {
     time: Attribute.Time;
     venue: Attribute.String & Attribute.Required;
     state: Attribute.String;
-    country: Attribute.String & Attribute.Required;
+    country: Attribute.String;
     genre: Attribute.String;
-    description: Attribute.Blocks & Attribute.Required;
-    avatar: Attribute.Media;
+    description: Attribute.Blocks;
+    avatar: Attribute.Media & Attribute.Required;
     coverPhoto: Attribute.Media;
-    artist_id: Attribute.Integer;
-    status: Attribute.String;
-    artist_ids: Attribute.Relation<
+    status: Attribute.Enumeration<['open', 'closed', 'delayed ']> &
+      Attribute.Required;
+    artists: Attribute.Relation<
+      'api::concert.concert',
+      'manyToMany',
+      'api::artist.artist'
+    >;
+    tickets: Attribute.Relation<
       'api::concert.concert',
       'oneToMany',
-      'api::artist.artist'
+      'api::ticket.ticket'
+    >;
+    wishlists: Attribute.Relation<
+      'api::concert.concert',
+      'oneToMany',
+      'api::wishlist.wishlist'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -901,6 +926,83 @@ export interface ApiConcertConcert extends Schema.CollectionType {
   };
 }
 
+export interface ApiFeedbackFeedback extends Schema.CollectionType {
+  collectionName: 'feedbacks';
+  info: {
+    singularName: 'feedback';
+    pluralName: 'feedbacks';
+    displayName: 'Feedback';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    app_user: Attribute.Relation<
+      'api::feedback.feedback',
+      'manyToOne',
+      'api::app-user.app-user'
+    >;
+    message: Attribute.Blocks;
+    email: Attribute.Email & Attribute.Required;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::feedback.feedback',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::feedback.feedback',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiOrderOrder extends Schema.CollectionType {
+  collectionName: 'orders';
+  info: {
+    singularName: 'order';
+    pluralName: 'orders';
+    displayName: 'Order';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    app_user: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'api::app-user.app-user'
+    >;
+    total_price: Attribute.Decimal;
+    order_date: Attribute.DateTime;
+    payment_method: Attribute.Enumeration<['cash', 'bank', 'e-wallet']>;
+    status: Attribute.Enumeration<
+      ['pending', 'completed', 'canceled', 'unavailable']
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTicketTicket extends Schema.CollectionType {
   collectionName: 'tickets';
   info: {
@@ -913,11 +1015,27 @@ export interface ApiTicketTicket extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    artist: Attribute.Relation<
+    concert: Attribute.Relation<
       'api::ticket.ticket',
-      'oneToOne',
-      'api::artist.artist'
+      'manyToOne',
+      'api::concert.concert'
     >;
+    app_users: Attribute.Relation<
+      'api::ticket.ticket',
+      'manyToMany',
+      'api::app-user.app-user'
+    >;
+    quantity: Attribute.Integer &
+      Attribute.Required &
+      Attribute.SetMinMax<{
+        min: 1;
+      }>;
+    price: Attribute.Decimal;
+    payment_status: Attribute.Enumeration<
+      ['pending', 'completed', 'canceled', 'unavailable']
+    > &
+      Attribute.DefaultTo<'pending'>;
+    purchase_date: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -929,6 +1047,45 @@ export interface ApiTicketTicket extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::ticket.ticket',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiWishlistWishlist extends Schema.CollectionType {
+  collectionName: 'wishlists';
+  info: {
+    singularName: 'wishlist';
+    pluralName: 'wishlists';
+    displayName: 'Wishlist';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    app_user: Attribute.Relation<
+      'api::wishlist.wishlist',
+      'manyToOne',
+      'api::app-user.app-user'
+    >;
+    concert: Attribute.Relation<
+      'api::wishlist.wishlist',
+      'manyToOne',
+      'api::concert.concert'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::wishlist.wishlist',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::wishlist.wishlist',
       'oneToOne',
       'admin::user'
     > &
@@ -957,7 +1114,10 @@ declare module '@strapi/types' {
       'api::app-user.app-user': ApiAppUserAppUser;
       'api::artist.artist': ApiArtistArtist;
       'api::concert.concert': ApiConcertConcert;
+      'api::feedback.feedback': ApiFeedbackFeedback;
+      'api::order.order': ApiOrderOrder;
       'api::ticket.ticket': ApiTicketTicket;
+      'api::wishlist.wishlist': ApiWishlistWishlist;
     }
   }
 }

@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "app_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::app-user.app-user",
+      "inversedBy": "orders"
+    },
+    "total_price": {
+      "type": "decimal"
+    },
+    "order_date": {
+      "type": "datetime"
+    },
+    "payment_method": {
+      "type": "enumeration",
+      "enum": [
+        "cash",
+        "bank",
+        "e-wallet"
+      ]
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "completed",
+        "canceled",
+        "unavailable"
+      ]
+    }
+  }
+}
