@@ -573,6 +573,50 @@ export interface PluginContentReleasesReleaseAction
   };
 }
 
+export interface PluginI18NLocale extends Schema.CollectionType {
+  collectionName: 'i18n_locale';
+  info: {
+    singularName: 'locale';
+    pluralName: 'locales';
+    collectionName: 'locales';
+    displayName: 'Locale';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    name: Attribute.String &
+      Attribute.SetMinMax<{
+        min: 1;
+        max: 50;
+      }>;
+    code: Attribute.String & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'plugin::i18n.locale',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'plugin::i18n.locale',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUsersPermissionsPermission
   extends Schema.CollectionType {
   collectionName: 'up_permissions';
@@ -678,7 +722,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     username: Attribute.String &
@@ -707,120 +750,36 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface PluginI18NLocale extends Schema.CollectionType {
-  collectionName: 'i18n_locale';
-  info: {
-    singularName: 'locale';
-    pluralName: 'locales';
-    collectionName: 'locales';
-    displayName: 'Locale';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: false;
-    };
-    'content-type-builder': {
-      visible: false;
-    };
-  };
-  attributes: {
-    name: Attribute.String &
-      Attribute.SetMinMax<{
-        min: 1;
-        max: 50;
-      }>;
-    code: Attribute.String & Attribute.Unique;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'plugin::i18n.locale',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'plugin::i18n.locale',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiAppUserAppUser extends Schema.CollectionType {
-  collectionName: 'app_users';
-  info: {
-    singularName: 'app-user';
-    pluralName: 'app-users';
-    displayName: 'appUser';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    first_name: Attribute.String & Attribute.Required;
-    last_name: Attribute.String & Attribute.Required;
-    email: Attribute.Email & Attribute.Required;
-    password: Attribute.Password & Attribute.Required;
-    address: Attribute.String;
-    city: Attribute.String;
-    state: Attribute.String;
-    country: Attribute.String;
-    phone_number: Attribute.String;
-    role: Attribute.Enumeration<['user', 'visitor']>;
     tickets: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'manyToMany',
       'api::ticket.ticket'
     >;
     orders: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'oneToMany',
       'api::order.order'
     >;
     feedbacks: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'oneToMany',
       'api::feedback.feedback'
     >;
     wishlists: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'oneToMany',
       'api::wishlist.wishlist'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'api::app-user.app-user',
+      'plugin::users-permissions.user',
       'oneToOne',
       'admin::user'
     > &
@@ -937,13 +896,13 @@ export interface ApiFeedbackFeedback extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    app_user: Attribute.Relation<
-      'api::feedback.feedback',
-      'manyToOne',
-      'api::app-user.app-user'
-    >;
     message: Attribute.Blocks;
     email: Attribute.Email & Attribute.Required;
+    user: Attribute.Relation<
+      'api::feedback.feedback',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -974,16 +933,16 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    app_user: Attribute.Relation<
-      'api::order.order',
-      'manyToOne',
-      'api::app-user.app-user'
-    >;
     total_price: Attribute.Decimal;
     order_date: Attribute.DateTime;
     payment_method: Attribute.Enumeration<['cash', 'bank', 'e-wallet']>;
     status: Attribute.Enumeration<
       ['pending', 'completed', 'canceled', 'unavailable']
+    >;
+    user: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1020,11 +979,6 @@ export interface ApiTicketTicket extends Schema.CollectionType {
       'manyToOne',
       'api::concert.concert'
     >;
-    app_users: Attribute.Relation<
-      'api::ticket.ticket',
-      'manyToMany',
-      'api::app-user.app-user'
-    >;
     quantity: Attribute.Integer &
       Attribute.Required &
       Attribute.SetMinMax<{
@@ -1036,6 +990,11 @@ export interface ApiTicketTicket extends Schema.CollectionType {
     > &
       Attribute.DefaultTo<'pending'>;
     purchase_date: Attribute.DateTime;
+    users: Attribute.Relation<
+      'api::ticket.ticket',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1065,15 +1024,15 @@ export interface ApiWishlistWishlist extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    app_user: Attribute.Relation<
-      'api::wishlist.wishlist',
-      'manyToOne',
-      'api::app-user.app-user'
-    >;
     concert: Attribute.Relation<
       'api::wishlist.wishlist',
       'manyToOne',
       'api::concert.concert'
+    >;
+    user: Attribute.Relation<
+      'api::wishlist.wishlist',
+      'manyToOne',
+      'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1107,11 +1066,10 @@ declare module '@strapi/types' {
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
+      'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'plugin::i18n.locale': PluginI18NLocale;
-      'api::app-user.app-user': ApiAppUserAppUser;
       'api::artist.artist': ApiArtistArtist;
       'api::concert.concert': ApiConcertConcert;
       'api::feedback.feedback': ApiFeedbackFeedback;

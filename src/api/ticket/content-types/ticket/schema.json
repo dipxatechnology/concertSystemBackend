@@ -18,12 +18,6 @@
       "target": "api::concert.concert",
       "inversedBy": "tickets"
     },
-    "app_users": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::app-user.app-user",
-      "inversedBy": "tickets"
-    },
     "quantity": {
       "type": "integer",
       "required": true,
@@ -44,6 +38,12 @@
     },
     "purchase_date": {
       "type": "datetime"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "tickets"
     }
   }
 }

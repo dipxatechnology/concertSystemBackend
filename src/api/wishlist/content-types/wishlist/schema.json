@@ -11,16 +11,16 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "app_user": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::app-user.app-user",
-      "inversedBy": "wishlists"
-    },
     "concert": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::concert.concert",
+      "inversedBy": "wishlists"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
       "inversedBy": "wishlists"
     }
   }

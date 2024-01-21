@@ -12,12 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "app_user": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::app-user.app-user",
-      "inversedBy": "orders"
-    },
     "total_price": {
       "type": "decimal"
     },
@@ -40,6 +34,12 @@
         "canceled",
         "unavailable"
       ]
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
     }
   }
 }
