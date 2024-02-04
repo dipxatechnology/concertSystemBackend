@@ -1,38 +1,31 @@
 {
-  "name": "concert-system-backend",
-  "private": true,
-  "version": "0.1.0",
-  "description": "A Strapi application",
+  "name": "fypbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "develop": "strapi develop",
-    "start": "strapi start",
-    "build": "strapi build",
-    "strapi": "strapi"
+    "start": "node server",
+    "dev": "nodemon server"
   },
-  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@strapi/plugin-cloud": "4.17.0",
-    "@strapi/plugin-documentation": "^4.17.1",
-    "@strapi/plugin-graphql": "^4.17.0",
-    "@strapi/plugin-i18n": "4.17.0",
-    "@strapi/plugin-users-permissions": "4.17.0",
-    "@strapi/strapi": "4.17.0",
-    "pg": "8.8.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "5.3.4",
-    "strapi-plugin-import-export-entries": "^1.23.1",
-    "styled-components": "5.3.3"
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "date-fns": "^3.3.1",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "express-rate-limit": "^7.1.5",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.1.1",
+    "mongoose-sequence": "^6.0.0",
+    "uuid": "^9.0.1"
   },
-  "author": {
-    "name": "A Strapi developer"
-  },
-  "strapi": {
-    "uuid": "c49a2f9d-c95a-440d-b5ae-0830aa2c9964"
-  },
-  "engines": {
-    "node": ">=18.0.0 <=20.x.x",
-    "npm": ">=6.0.0"
-  },
-  "license": "MIT"
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "typescript": "^5.3.3"
+  }
 }
