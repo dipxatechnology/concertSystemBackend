@@ -15,7 +15,6 @@ const ticketSchema = new mongoose.Schema({
   concert: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Concert',
-    required: true,
   },
 });
 
