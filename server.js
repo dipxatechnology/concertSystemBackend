@@ -31,9 +31,9 @@ app.use("/", require("./routes/root"));
 
 // app.use('/auth', require('./routes/authsRoutes'))
 app.use('/users', require('./routes/userRoutes'))
-app.use('/admins', require('./routes/adminRoutes'))
 app.use('/tickets', require('./routes/ticketRoutes'))
 app.use('/concerts', require('./routes/concertRoutes'))
+app.use('/artists', require('./routes/artistRoutes'))
 
 app.all("*", (req, res) => {
   res.status(404);

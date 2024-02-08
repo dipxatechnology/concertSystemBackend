@@ -8,6 +8,6 @@ router.route('/')
     .patch(artistController.updateArtist)
     .delete(artistController.deleteArtist)
 
-router.get('/:id', )
+router.get('/:id', artistController.getArtistById)
 
 module.exports = router

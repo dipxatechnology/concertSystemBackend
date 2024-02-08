@@ -20,15 +20,11 @@ const userSchema = new mongoose.Schema({
   roles: [
     {
       type: String,
-      default: "Guest",
+      default: "User",
     },
   ],
   profile: {
     type: String,
-  },
-  active: {
-    type: Boolean,
-    default: true,
   },
   ticket: [
     {
