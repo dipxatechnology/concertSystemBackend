@@ -42,6 +42,7 @@ const createConcert = asyncHandler(async (req, res) => {
     artist,
     price,
     description,
+    state,
   } = req.body;
 
   //this helps confirm fields
@@ -54,7 +55,8 @@ const createConcert = asyncHandler(async (req, res) => {
     !country ||
     !genre ||
     !artist ||
-    !price
+    !price ||
+    !state
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -76,6 +78,7 @@ const createConcert = asyncHandler(async (req, res) => {
     artist,
     price,
     description,
+    state
   };
 
   //storing new user
@@ -102,6 +105,7 @@ const updateConcert = asyncHandler(async (req, res) => {
     artist,
     price,
     description,
+    state,
   } = req.body;
 
   //checks fields
@@ -115,7 +119,8 @@ const updateConcert = asyncHandler(async (req, res) => {
     !country ||
     !genre ||
     !artist ||
-    !price
+    !price ||
+    !state
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -141,6 +146,7 @@ const updateConcert = asyncHandler(async (req, res) => {
   concert.genre = genre;
   concert.artist = artist;
   concert.price = price;
+  concert.state = state;
 
   const updatedConcert = await concert.save();
 
