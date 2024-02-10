@@ -32,10 +32,10 @@ const getTicketById = asyncHandler(async (req, res) => {
 });
 
 const createTicket = asyncHandler(async (req, res) => {
-  const { title, status, concert } = req.body;
+  const { title, status, concert, quantity, user, date } = req.body;
 
   //this helps confirm fields
-  if (!title || !concert || !status) {
+  if (!title || !concert || !status || !quantity) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -46,7 +46,7 @@ const createTicket = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Duplicated ticket title" });
   }
 
-  const ticketObject = { title, concert, status };
+  const ticketObject = { title, concert, status, user, date };
 
   //storing new ticket
   const ticket = await Ticket.create(ticketObject);
@@ -60,11 +60,36 @@ const createTicket = asyncHandler(async (req, res) => {
   }
 });
 
+// const createTicket = asyncHandler(async (req, res) => {
+//   const { title, status, concert, quantity, date } = req.body;
+
+//   // Get user ID from the request (assuming it's stored in the request during authentication)
+//   const userId = req.user.id;
+
+//   // Validate other fields
+//   if (!title || !concert || !status || !quantity) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   // Create a new ticket and associate it with the user
+//   const ticketObject = { title, concert, status, user: userId, quantity, date };
+//   const ticket = await Ticket.create(ticketObject);
+
+//   if (ticket) {
+//     // Update the user's ticket history
+//     await User.findByIdAndUpdate(userId, { $push: { ticket: ticket._id } });
+
+//     return res.status(201).json({ message: `new ticket ${ticket.title} created` });
+//   } else {
+//     res.status(400).json({ message: "Invalid ticket data " });
+//   }
+// });
+
 const updateTicket = asyncHandler(async (req, res) => {
-  const { id, title, status, concert } = req.body;
+  const { id, title, status, concert, quantity, user, date } = req.body;
 
   //checks fields
-  if (!id || !title || !status || !concert) {
+  if (!id || !title || !status || !concert || !quantity) {
     return res.status(400).json({ message: "all fields are required" });
   }
 
