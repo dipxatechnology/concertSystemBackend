@@ -2,11 +2,16 @@ const FeedBack = require("../models/Feedback");
 const asyncHandler = require("express-async-handler");
 
 const getAllFeedbacks = asyncHandler(async (req, res) => {
-  const feedbacks = await FeedBack.find().lean();
-  if (!feedbacks?.length) {
-    return res.status(400).json({ message: "No feedback found " });
-  } else {
-    return res.json(feedbacks);
+  try {
+    const feedbacks = await FeedBack.find().populate("user").lean();
+
+    if (!feedbacks?.length) {
+      return res.status(400).json({ message: "No feedbacks found " });
+    } else {
+      return res.json(users);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -68,7 +73,7 @@ const updateFeedback = asyncHandler(async (req, res) => {
   }
 
   //checks dups
-  const duplicate = await User.findOne({ user }).lean().exec();
+  const duplicate = await FeedBack.findOne({ user }).lean().exec();
   if (duplicate && duplicate?._id.toString() !== id) {
     return res.status(409).json({ message: "duplicate username" });
   }
@@ -98,7 +103,7 @@ const deleteFeedback = asyncHandler(async (req, res) => {
 
   const result = await FeedBack.deleteOne();
 
-  return res.json(`User ${result.username} has been deleted.`);
+  return res.json(`Feedback ${result.username} has been deleted.`);
 });
 
 module.exports = {

@@ -2,29 +2,34 @@ const Ticket = require("../models/Ticket");
 const asyncHandler = require("express-async-handler");
 
 const getAllTickets = asyncHandler(async (req, res) => {
-  const ticket = await Ticket.find().lean();
-  if (!ticket?.length) {
-    return res.status(400).json({ message: "No tickets found " });
-  } else {
-    return res.json(ticket);
+  try {
+    const tickets = await Ticket.find().populate("concert").lean();
+
+    if (!tickets?.length) {
+      return res.status(400).json({ message: "No tickets found " });
+    } else {
+      return res.json(tickets);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
 const getTicketById = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-  
-    if (!id) {
-      return res.status(400).json({ message: "Ticket ID required" });
-    }
-  
-    const ticket = await Ticket.findById(id).lean().exec();
-  
-    if (!ticket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-  
-    return res.json(ticket);
-  });
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "Ticket ID required" });
+  }
+
+  const ticket = await Ticket.findById(id).populate('concert').lean().exec();
+
+  if (!ticket) {
+    return res.status(404).json({ message: "Ticket not found" });
+  }
+
+  return res.json(ticket);
+});
 
 const createTicket = asyncHandler(async (req, res) => {
   const { title, status, concert } = req.body;
@@ -47,57 +52,65 @@ const createTicket = asyncHandler(async (req, res) => {
   const ticket = await Ticket.create(ticketObject);
 
   if (ticket) {
-    return res.status(201).json({ message: `new ticket ${ticket.title} created` });
+    return res
+      .status(201)
+      .json({ message: `new ticket ${ticket.title} created` });
   } else {
     res.status(400).json({ message: "Invalid ticket data " });
   }
 });
 
 const updateTicket = asyncHandler(async (req, res) => {
-    const {id, title, status, concert} = req.body
+  const { id, title, status, concert } = req.body;
 
-    //checks fields
-    if (!id || !title || !status || !concert) {
-        return res.status(400).json({message : 'all fields are required'})
-    }
+  //checks fields
+  if (!id || !title || !status || !concert) {
+    return res.status(400).json({ message: "all fields are required" });
+  }
 
-    const ticket = await Ticket.findById(id).exec()
+  const ticket = await Ticket.findById(id).exec();
 
-    if(!ticket) {
-        return res.status(400).json({message : 'ticket not found'})
-    }
+  if (!ticket) {
+    return res.status(400).json({ message: "ticket not found" });
+  }
 
-    //checks dups
-    const duplicate = await Ticket.findOne({ title }).lean().exec()
-    if(duplicate && duplicate?._id.toString() !== id) {
-        return res.status(409).json({message : 'duplicate title'})
-    }
+  //checks dups
+  const duplicate = await Ticket.findOne({ title }).lean().exec();
+  if (duplicate && duplicate?._id.toString() !== id) {
+    return res.status(409).json({ message: "duplicate title" });
+  }
 
-    ticket.title = title
-    ticket.concert = concert
-    ticket.status = status
+  ticket.title = title;
+  ticket.concert = concert;
+  ticket.status = status;
 
-    const updatedTicket = await ticket.save()
+  const updatedTicket = await ticket.save();
 
-    return res.json({message : `updated ${updatedTicket.title}`})
+  return res.json({ message: `updated ${updatedTicket.title}` });
 });
 
 const deleteTicket = asyncHandler(async (req, res) => {
-    const {id} = req.body
+  const { id } = req.body;
 
-    if(!id) {
-        return res.status(400).json({message : 'Ticket ID required'})
-    }
+  if (!id) {
+    return res.status(400).json({ message: "Ticket ID required" });
+  }
 
-    const ticket = await Ticket.findById(id).exec()
+  const ticket = await Ticket.findById(id).exec();
 
-    if(!ticket) {
-        return res.status(400).json({ message : 'Ticket does not exist'})
-    }
+  if (!ticket) {
+    return res.status(400).json({ message: "Ticket does not exist" });
+  }
 
-    const result = await Ticket.deleteOne()
+  const result = await Ticket.deleteOne();
 
-    return res.json(`User ${result.title} has been deleted.`)
+  return res.json(`User ${result.title} has been deleted.`);
 });
 
-module.exports = { getAllTickets, getTicketById, createTicket, updateTicket, deleteTicket };
+module.exports = {
+  getAllTickets,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  deleteTicket,
+};

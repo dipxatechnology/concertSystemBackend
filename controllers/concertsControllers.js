@@ -2,11 +2,16 @@ const Concert = require("../models/Concert");
 const asyncHandler = require("express-async-handler");
 
 const getAllConcerts = asyncHandler(async (req, res) => {
-  const concert = await Concert.find().lean();
-  if (!concert?.length) {
-    return res.status(400).json({ message: "No concerts found " });
-  } else {
-    return res.json(concert);
+  try {
+    const concerts = await Concert.find().populate("artist").lean();
+
+    if (!concerts?.length) {
+      return res.status(400).json({ message: "No concerts found " });
+    } else {
+      return res.json(concerts);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

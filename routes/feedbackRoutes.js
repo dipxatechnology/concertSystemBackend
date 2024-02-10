@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const concertController = require('../controllers/feedbacksControllers')
+const feedbacksController = require('../controllers/feedbacksControllers')
 
 router.route('/')
-    .get()
-    .post()
-    .patch()
-    .delete()
+    .get(feedbacksController.getAllFeedbacks)
+    .post(feedbacksController.createFeedback)
+    .patch(feedbacksController.updateFeedback)
+    .delete(feedbacksController.deleteFeedback)
 
-router.get('/:id', )
+router.get('/:id', feedbacksController.getFeedbackById)
 
 module.exports = router

@@ -2,11 +2,16 @@ const Artist = require("../models/Artist");
 const asyncHandler = require("express-async-handler");
 
 const getAllArtists = asyncHandler(async (req, res) => {
-  const artist = await Artist.find().lean();
-  if (!artist?.length) {
-    return res.status(400).json({ message: "No artist found " });
-  } else {
-    return res.json(artist);
+  try {
+    const artists = await Artist.find().populate("concert").lean();
+
+    if (!artists?.length) {
+      return res.status(400).json({ message: "No artist found " });
+    } else {
+      return res.json(artists);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

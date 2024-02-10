@@ -3,11 +3,19 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select("-password").lean();
-  if (!users?.length) {
-    return res.status(400).json({ message: "No users found " });
-  } else {
-    return res.json(users);
+  try {
+    const users = await User.find()
+      .select("-password")
+      .populate("ticket")
+      .lean();
+
+    if (!users?.length) {
+      return res.status(400).json({ message: "No users found " });
+    } else {
+      return res.json(users);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -73,7 +81,8 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { id, username, password, email, phone_number, roles, profile } = req.body;
+  const { id, username, password, email, phone_number, roles, profile, ticket } =
+    req.body;
 
   //checks fields
   if (
@@ -100,12 +109,13 @@ const updateUser = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "duplicate username" });
   }
 
-  user.username = username
-  user.roles = roles
-  user.profile = profile
-  user.email = email
-  user.phone_number = phone_number
-  user.profile = profile
+  user.username = username;
+  user.roles = roles;
+  user.profile = profile;
+  user.email = email;
+  user.phone_number = phone_number;
+  user.profile = profile;
+  user.ticket = ticket;
 
   if (password) {
     user.password = await bcrypt.hash(password, 10);

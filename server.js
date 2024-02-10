@@ -34,6 +34,7 @@ app.use('/users', require('./routes/userRoutes'))
 app.use('/tickets', require('./routes/ticketRoutes'))
 app.use('/concerts', require('./routes/concertRoutes'))
 app.use('/artists', require('./routes/artistRoutes'))
+app.use('/feedbacks', require('./routes/feedbackRoutes'))
 
 app.all("*", (req, res) => {
   res.status(404);
