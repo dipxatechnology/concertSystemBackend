@@ -3,12 +3,14 @@ const asyncHandler = require("express-async-handler");
 
 const getAllFeedbacks = asyncHandler(async (req, res) => {
   try {
-    const feedbacks = await FeedBack.find().populate("user").lean();
+    const feedbacks = await FeedBack.find()
+      .populate({ path: "user", select: "-password" })
+      .lean();
 
     if (!feedbacks?.length) {
       return res.status(400).json({ message: "No feedbacks found " });
     } else {
-      return res.json(users);
+      return res.json(feedbacks);
     }
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
@@ -22,7 +24,10 @@ const getFeedbackById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Feedback ID required" });
   }
 
-  const feedbacks = await FeedBack.findById(id).lean().exec();
+  const feedbacks = await FeedBack.findById(id)
+    .populate({ path: "user", select: "-password" })
+    .lean()
+    .exec();
 
   if (!feedbacks) {
     return res.status(404).json({ message: "feedback not found" });
@@ -32,27 +37,23 @@ const getFeedbackById = asyncHandler(async (req, res) => {
 });
 
 const createFeedback = asyncHandler(async (req, res) => {
-  const { user, message, email, username } = req.body;
+  const { user, message } = req.body;
 
   //this helps confirm fields
-  if (!user || !message || !email || !username) {
+  if (!user || !message) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   const userObject = {
     user,
-    username,
     message,
-    email,
   };
 
   //storing new Feedback
   const feedbacks = await FeedBack.create(userObject);
 
   if (feedbacks) {
-    return res
-      .status(201)
-      .json({ message: `new feedback from ${username} created` });
+    return res.status(201).json({ message: `new feedback form created` });
   } else {
     res.status(400).json({ message: "Invalid feedback data " });
   }
@@ -62,7 +63,7 @@ const updateFeedback = asyncHandler(async (req, res) => {
   const { id, username, user, message, email } = req.body;
 
   //checks fields
-  if (!id || !username || !user || !message || !email) {
+  if (!id || !user || !message) {
     return res.status(400).json({ message: "all fields are required" });
   }
 

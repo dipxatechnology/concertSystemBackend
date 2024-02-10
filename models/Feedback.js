@@ -8,12 +8,6 @@ const feedbackSchema = new mongoose.Schema({
     message: {
         type: String,
     },
-    username: {
-        type: String
-    },
-    email: {
-        type: String,
-    }
 })
 
 module.exports = mongoose.model('FeedBack', feedbackSchema)
