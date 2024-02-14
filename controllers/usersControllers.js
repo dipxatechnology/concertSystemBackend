@@ -26,7 +26,17 @@ const getUserById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User ID required" });
   }
 
-  const user = await User.findById(id).select("-password").lean().exec();
+  const user = await User.findById(id)
+  .select("-password")
+  .populate({
+    path: "ticket",
+    populate: {
+      path: "concert",
+      model: "Concert", 
+    },
+  })
+  .lean()
+  .exec();
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
@@ -81,8 +91,16 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { id, username, password, email, phone_number, roles, profile, ticket } =
-    req.body;
+  const {
+    id,
+    username,
+    password,
+    email,
+    phone_number,
+    roles,
+    profile,
+    ticket,
+  } = req.body;
 
   //checks fields
   if (
