@@ -1,10 +1,20 @@
 const Ticket = require("../models/Ticket");
-const User = require("../models/User")
+const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
 
 const getAllTickets = asyncHandler(async (req, res) => {
   try {
-    const tickets = await Ticket.find().populate("concert").lean();
+    const tickets = await Ticket.find()
+      .populate({
+        path: "user",
+        model: "User",
+        select: "-password"
+      })
+      .populate({
+        path: "concert",
+        model: "Concert",
+      })
+      .lean();
 
     if (!tickets?.length) {
       return res.status(400).json({ message: "No tickets found " });
@@ -23,7 +33,7 @@ const getTicketById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Ticket ID required" });
   }
 
-  const ticket = await Ticket.findById(id).populate('concert').lean().exec();
+  const ticket = await Ticket.findById(id).populate("concert").lean().exec();
 
   if (!ticket) {
     return res.status(404).json({ message: "Ticket not found" });
@@ -33,64 +43,40 @@ const getTicketById = asyncHandler(async (req, res) => {
 });
 
 const createTicket = asyncHandler(async (req, res) => {
-  const { status, concert: {_id: concertId}, quantity, user: {_id : userId}, date } = req.body;
+  const { status, concert, quantity, user, date } = req.body;
 
-  //this helps confirm fields
-  if (!concertId || !status || !quantity || !userId) {
+  if (!concert || !status || !quantity || !user || !date) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  //checks for dups
-  const duplicate = await Ticket.findOne({ user: userId }).lean().exec();
+  const duplicate = await Ticket.findOne({ user }).lean().exec();
 
   if (duplicate) {
-    return res.status(409).json({ message: "Duplicated ticket title" });
+    return res.status(409).json({ message: "Duplicated ticket user" });
   }
 
-  const ticketObject = {concertId, status, user: {_id: userId}, date };
+  const ticketObject = {
+    status,
+    concert,
+    quantity,
+    user,
+    date,
+  };
 
-  //storing new ticket
   const ticket = await Ticket.create(ticketObject);
 
   if (ticket) {
-    return res
-      .status(201)
-      .json({ message: `new ticket created` });
+    return res.status(201).json({ message: "New ticket created" });
   } else {
-    res.status(400).json({ message: "Invalid ticket data " });
+    res.status(400).json({ message: "Invalid ticket data" });
   }
 });
 
-// const createTicket = asyncHandler(async (req, res) => {
-//   const { title, status, concert, quantity, date } = req.body;
-
-//   // Get user ID from the request (assuming it's stored in the request during authentication)
-//   const userId = req.user.id;
-
-//   // Validate other fields
-//   if (!title || !concert || !status || !quantity) {
-//     return res.status(400).json({ message: "All fields are required" });
-//   }
-
-//   // Create a new ticket and associate it with the user
-//   const ticketObject = { title, concert, status, user: userId, quantity, date };
-//   const ticket = await Ticket.create(ticketObject);
-
-//   if (ticket) {
-//     // Update the user's ticket history
-//     await User.findByIdAndUpdate(userId, { $push: { ticket: ticket._id } });
-
-//     return res.status(201).json({ message: `new ticket ${ticket.title} created` });
-//   } else {
-//     res.status(400).json({ message: "Invalid ticket data " });
-//   }
-// });
-
 const updateTicket = asyncHandler(async (req, res) => {
-  const { id, status, concert: {_id: concertId}, quantity, user: {_id : userId} } = req.body;
+  const { id, status, concert, quantity } = req.body;
 
   //checks fields
-  if (!id || !status || !concertId || !quantity || !userId) {
+  if (!id || !status || !concert || !quantity) {
     return res.status(400).json({ message: "all fields are required" });
   }
 
@@ -100,8 +86,9 @@ const updateTicket = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "ticket not found" });
   }
 
-  ticket.concert = concertId;
+  ticket.concert = concert;
   ticket.status = status;
+  ticket.quantity = quantity;
 
   const updatedTicket = await ticket.save();
 
