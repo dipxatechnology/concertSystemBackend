@@ -1,4 +1,5 @@
 const Ticket = require("../models/Ticket");
+const User = require("../models/User")
 const asyncHandler = require("express-async-handler");
 
 const getAllTickets = asyncHandler(async (req, res) => {
@@ -32,21 +33,21 @@ const getTicketById = asyncHandler(async (req, res) => {
 });
 
 const createTicket = asyncHandler(async (req, res) => {
-  const { title, status, concert, quantity, user, date } = req.body;
+  const { status, concert: {_id: concertId}, quantity, user: {_id : userId}, date } = req.body;
 
   //this helps confirm fields
-  if (!title || !concert || !status || !quantity) {
+  if (!concertId || !status || !quantity || !userId) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   //checks for dups
-  const duplicate = await Ticket.findOne({ title }).lean().exec();
+  const duplicate = await Ticket.findOne({ user: userId }).lean().exec();
 
   if (duplicate) {
     return res.status(409).json({ message: "Duplicated ticket title" });
   }
 
-  const ticketObject = { title, concert, status, user, date };
+  const ticketObject = {concertId, status, user: {_id: userId}, date };
 
   //storing new ticket
   const ticket = await Ticket.create(ticketObject);
@@ -54,7 +55,7 @@ const createTicket = asyncHandler(async (req, res) => {
   if (ticket) {
     return res
       .status(201)
-      .json({ message: `new ticket ${ticket.title} created` });
+      .json({ message: `new ticket created` });
   } else {
     res.status(400).json({ message: "Invalid ticket data " });
   }
@@ -86,10 +87,10 @@ const createTicket = asyncHandler(async (req, res) => {
 // });
 
 const updateTicket = asyncHandler(async (req, res) => {
-  const { id, title, status, concert, quantity, user, date } = req.body;
+  const { id, status, concert: {_id: concertId}, quantity, user: {_id : userId} } = req.body;
 
   //checks fields
-  if (!id || !title || !status || !concert || !quantity) {
+  if (!id || !status || !concertId || !quantity || !userId) {
     return res.status(400).json({ message: "all fields are required" });
   }
 
@@ -99,14 +100,7 @@ const updateTicket = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "ticket not found" });
   }
 
-  //checks dups
-  const duplicate = await Ticket.findOne({ title }).lean().exec();
-  if (duplicate && duplicate?._id.toString() !== id) {
-    return res.status(409).json({ message: "duplicate title" });
-  }
-
-  ticket.title = title;
-  ticket.concert = concert;
+  ticket.concert = concertId;
   ticket.status = status;
 
   const updatedTicket = await ticket.save();

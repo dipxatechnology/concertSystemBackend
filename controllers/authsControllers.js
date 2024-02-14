@@ -44,8 +44,17 @@ const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  // Send token containing username and roles
-  res.json({ accessToken });
+  res.json({
+    accessToken,
+    userData: {
+      _id: foundUser._id,
+      username: foundUser.username,
+      phone_number: foundUser.phone_number,
+      roles: foundUser.roles,
+      profile: foundUser.profile,
+      ticket: foundUser.ticket,
+    },
+  });
 });
 
 const refresh = (req, res) => {
