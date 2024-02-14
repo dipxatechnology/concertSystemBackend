@@ -176,5 +176,3 @@ POST /artists - Creates new artist (requires JSON body)
 PATCH /artists - Updates artist (requires JSON body)
 
 DELETE /artists - Deletes artist (requires JSON body with ID)
-
-### If there are any mistakes present, do let me know.
