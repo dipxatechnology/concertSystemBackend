@@ -49,12 +49,6 @@ const createTicket = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  const duplicate = await Ticket.findOne({ user }).lean().exec();
-
-  if (duplicate) {
-    return res.status(409).json({ message: "Duplicated ticket user" });
-  }
-
   const ticketObject = {
     status,
     concert,
