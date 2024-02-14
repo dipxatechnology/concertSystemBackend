@@ -45,6 +45,11 @@ const getTicketById = asyncHandler(async (req, res) => {
 const createTicket = asyncHandler(async (req, res) => {
   const { status, concert, quantity, user, date } = req.body;
 
+  const existingUser = await User.findById(user);
+    if (!existingUser) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
   if (!concert || !status || !quantity || !user || !date) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -57,9 +62,12 @@ const createTicket = asyncHandler(async (req, res) => {
     date,
   };
 
-  const ticket = await Ticket.create(ticketObject);
+  const tickets = await Ticket.create(ticketObject);
 
-  if (ticket) {
+  existingUser.ticket.push(tickets._id);
+    await existingUser.save();
+
+  if (tickets) {
     return res.status(201).json({ message: "New ticket created" });
   } else {
     res.status(400).json({ message: "Invalid ticket data" });
