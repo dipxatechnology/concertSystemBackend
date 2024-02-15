@@ -3,9 +3,7 @@ const asyncHandler = require("express-async-handler");
 
 const getAllFeedbacks = asyncHandler(async (req, res) => {
   try {
-    const feedbacks = await FeedBack.find()
-      .populate({ path: "user", select: "-password" })
-      .lean();
+    const feedbacks = await FeedBack.find().lean();
 
     if (!feedbacks?.length) {
       return res.status(400).json({ message: "No feedbacks found " });
@@ -37,15 +35,16 @@ const getFeedbackById = asyncHandler(async (req, res) => {
 });
 
 const createFeedback = asyncHandler(async (req, res) => {
-  const { user, message } = req.body;
+  const { username, message, email } = req.body;
 
   //this helps confirm fields
-  if (!user || !message) {
+  if (!username || !message || !email) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   const userObject = {
-    user,
+    username,
+    email,
     message,
   };
 
@@ -60,10 +59,10 @@ const createFeedback = asyncHandler(async (req, res) => {
 });
 
 const updateFeedback = asyncHandler(async (req, res) => {
-  const { id, username, user, message, email } = req.body;
+  const { id, username, message, email } = req.body;
 
   //checks fields
-  if (!id || !user || !message) {
+  if (!id || !message || !email || !username) {
     return res.status(400).json({ message: "all fields are required" });
   }
 
@@ -74,12 +73,11 @@ const updateFeedback = asyncHandler(async (req, res) => {
   }
 
   //checks dups
-  const duplicate = await FeedBack.findOne({ user }).lean().exec();
+  const duplicate = await FeedBack.findOne({ username }).lean().exec();
   if (duplicate && duplicate?._id.toString() !== id) {
     return res.status(409).json({ message: "duplicate username" });
   }
 
-  feedbacks.user = user;
   feedbacks.message = message;
   feedbacks.username = username;
   feedbacks.email = email;
