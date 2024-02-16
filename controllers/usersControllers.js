@@ -27,16 +27,16 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(id)
-  .select("-password")
-  .populate({
-    path: "ticket",
-    populate: {
-      path: "concert",
-      model: "Concert", 
-    },
-  })
-  .lean()
-  .exec();
+    .select("-password")
+    .populate({
+      path: "ticket",
+      populate: {
+        path: "concert",
+        model: "Concert",
+      },
+    })
+    .lean()
+    .exec();
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
@@ -46,7 +46,17 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const createUser = asyncHandler(async (req, res) => {
-  const { username, password, email, phone_number, roles, profile } = req.body;
+  const {
+    username,
+    password,
+    email,
+    phone_number,
+    roles,
+    profile,
+    address,
+    postcode,
+    country,
+  } = req.body;
 
   //this helps confirm fields
   if (
@@ -56,7 +66,10 @@ const createUser = asyncHandler(async (req, res) => {
     !roles.length ||
     !profile ||
     !email ||
-    !phone_number
+    !phone_number || 
+    !address ||
+    !postcode ||
+    !country
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -78,6 +91,9 @@ const createUser = asyncHandler(async (req, res) => {
     profile,
     email,
     phone_number,
+    address,
+    postcode,
+    country
   };
 
   //storing new user
@@ -99,6 +115,9 @@ const updateUser = asyncHandler(async (req, res) => {
     phone_number,
     roles,
     profile,
+    address,
+    postcode,
+    country,
     ticket,
   } = req.body;
 
@@ -110,7 +129,10 @@ const updateUser = asyncHandler(async (req, res) => {
     !roles.length ||
     !email ||
     !phone_number ||
-    !profile
+    !profile ||
+    !address ||
+    !postcode ||
+    !country
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -133,6 +155,9 @@ const updateUser = asyncHandler(async (req, res) => {
   user.email = email;
   user.phone_number = phone_number;
   user.profile = profile;
+  user.address = address;
+  user.postcode = postcode;
+  user.country = country;
   user.ticket = ticket;
 
   if (password) {

@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   phone_number: {
     type: String,
+    required: true
   },
   roles: [
     {
@@ -25,6 +26,18 @@ const userSchema = new mongoose.Schema({
   ],
   profile: {
     type: String,
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  postcode: {
+    type: String,
+    required: true
+  },
+  country: {
+    type: String,
+    required: true
   },
   ticket: [
     {
