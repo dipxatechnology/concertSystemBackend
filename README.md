@@ -81,7 +81,7 @@ GET /users - Retrieves all users (requires JWT)
 
 GET /users/:id - Retrieves a specific user by ID (requires JWT)
 
-POST /users - Creates a new user (requires JSON body)
+POST /createUser - Creates a new user (requires JSON body doesnt need jwt)
 
 ```json
 // example of POST user json body 
