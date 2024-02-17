@@ -113,26 +113,21 @@ const updateUser = asyncHandler(async (req, res) => {
     password,
     email,
     phone_number,
-    roles,
-    profile,
     address,
     postcode,
     country,
-    ticket,
   } = req.body;
 
   //checks fields
   if (
     !id ||
     !username ||
-    !Array.isArray(roles) ||
-    !roles.length ||
     !email ||
     !phone_number ||
-    !profile ||
     !address ||
     !postcode ||
-    !country
+    !country ||
+    !password
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -144,21 +139,18 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   //checks dups
-  const duplicate = await User.findOne({ username }).lean().exec();
-  if (duplicate && duplicate?._id.toString() !== id) {
-    return res.status(409).json({ message: "duplicate username" });
-  }
+  // const duplicate = await User.findOne({ username }).lean().exec();
+  // if (duplicate && duplicate?._id.toString() !== id) {
+  //   return res.status(409).json({ message: "duplicate username" });
+  // }
 
   user.username = username;
-  user.roles = roles;
-  user.profile = profile;
   user.email = email;
   user.phone_number = phone_number;
-  user.profile = profile;
   user.address = address;
   user.postcode = postcode;
   user.country = country;
-  user.ticket = ticket;
+  user.password = password;
 
   if (password) {
     user.password = await bcrypt.hash(password, 10);
