@@ -116,6 +116,7 @@ const updateUser = asyncHandler(async (req, res) => {
     address,
     postcode,
     country,
+    profile,
   } = req.body;
 
   //checks fields
@@ -127,7 +128,8 @@ const updateUser = asyncHandler(async (req, res) => {
     !address ||
     !postcode ||
     !country ||
-    !password
+    !password ||
+    !profile
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -151,6 +153,7 @@ const updateUser = asyncHandler(async (req, res) => {
   user.postcode = postcode;
   user.country = country;
   user.password = password;
+  user.profile = profile;
 
   if (password) {
     user.password = await bcrypt.hash(password, 10);
