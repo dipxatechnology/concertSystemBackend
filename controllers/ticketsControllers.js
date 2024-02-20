@@ -8,7 +8,7 @@ const getAllTickets = asyncHandler(async (req, res) => {
       .populate({
         path: "user",
         model: "User",
-        select: "-password"
+        select: "-password",
       })
       .populate({
         path: "concert",
@@ -33,7 +33,18 @@ const getTicketById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Ticket ID required" });
   }
 
-  const ticket = await Ticket.findById(id).populate("concert").lean().exec();
+  const ticket = await Ticket.findById(id)
+    .populate({
+      path: "user",
+      model: "User",
+      select: "-password",
+    })
+    .populate({
+      path: "concert",
+      model: "Concert",
+    })
+    .lean()
+    .exec();
 
   if (!ticket) {
     return res.status(404).json({ message: "Ticket not found" });
@@ -46,9 +57,9 @@ const createTicket = asyncHandler(async (req, res) => {
   const { status, concert, quantity, user, date } = req.body;
 
   const existingUser = await User.findById(user);
-    if (!existingUser) {
-      return res.status(400).json({ message: "User not found" });
-    }
+  if (!existingUser) {
+    return res.status(400).json({ message: "User not found" });
+  }
 
   if (!concert || !status || !quantity || !user || !date) {
     return res.status(400).json({ message: "All fields are required" });
@@ -65,7 +76,7 @@ const createTicket = asyncHandler(async (req, res) => {
   const tickets = await Ticket.create(ticketObject);
 
   existingUser.ticket.push(tickets._id);
-    await existingUser.save();
+  await existingUser.save();
 
   if (tickets) {
     return res.status(201).json({ message: "New ticket created" });
@@ -110,7 +121,7 @@ const deleteTicket = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Ticket does not exist" });
   }
 
-  const result = await Ticket.deleteOne();
+  const result = await ticket.deleteOne();
 
   return res.json(`User ${result.title} has been deleted.`);
 });

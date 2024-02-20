@@ -22,7 +22,7 @@ const getArtistById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Artist ID required" });
   }
 
-  const artist = await Artist.findById(id).lean().exec();
+  const artist = await Artist.findById(id).populate("concert").lean().exec();
 
   if (!artist) {
     return res.status(404).json({ message: "Artist not found" });
@@ -35,14 +35,7 @@ const createArtist = asyncHandler(async (req, res) => {
   const { username, roles, profile, genre, bio, social } = req.body;
 
   //this helps confirm fields
-  if (
-    !username ||
-    !roles ||
-    !profile ||
-    !genre ||
-    !bio ||
-    !social 
-  ) {
+  if (!username || !roles || !profile || !genre || !bio || !social) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -75,7 +68,7 @@ const createArtist = asyncHandler(async (req, res) => {
 });
 
 const updateArtist = asyncHandler(async (req, res) => {
-  const { id, username, roles, profile, genre, bio, social, concert } =
+  const { id, username, roles, profile, genre, bio, social, concerts } =
     req.body;
 
   //checks fields
@@ -87,7 +80,7 @@ const updateArtist = asyncHandler(async (req, res) => {
     !genre ||
     !bio ||
     !social ||
-    !concert
+    !concerts
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -98,11 +91,11 @@ const updateArtist = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "artist not found" });
   }
 
-  //checks dups
-  const duplicate = await Artist.findOne({ username }).lean().exec();
-  if (duplicate && duplicate?._id.toString() !== id) {
-    return res.status(409).json({ message: "duplicate title" });
-  }
+  // Commenting out the duplicate check temporarily
+  // const duplicate = await Artist.findOne({ username }).lean().exec();
+  // if (duplicate && duplicate?._id.toString() !== id) {
+  //   return res.status(409).json({ message: "duplicate title" });
+  // }
 
   artist.username = username;
   artist.roles = roles;
@@ -110,9 +103,9 @@ const updateArtist = asyncHandler(async (req, res) => {
   artist.genre = genre;
   artist.bio = bio;
   artist.social = social;
-  artist.concert = concert;
+  artist.concert = concerts;
 
-  const updatedArtist = await concert.save();
+  const updatedArtist = await artist.save();
 
   return res.json({ message: `updated ${updatedArtist.username}` });
 });
@@ -130,7 +123,7 @@ const deleteArtist = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Artist does not exist" });
   }
 
-  const result = await Artist.deleteOne();
+  const result = await artist.deleteOne();
 
   return res.json(`Artist ${result.username} has been deleted.`);
 });

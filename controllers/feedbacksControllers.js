@@ -22,10 +22,7 @@ const getFeedbackById = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Feedback ID required" });
   }
 
-  const feedbacks = await FeedBack.findById(id)
-    .populate({ path: "user", select: "-password" })
-    .lean()
-    .exec();
+  const feedbacks = await FeedBack.findById(id).lean().exec();
 
   if (!feedbacks) {
     return res.status(404).json({ message: "feedback not found" });
@@ -73,10 +70,10 @@ const updateFeedback = asyncHandler(async (req, res) => {
   }
 
   //checks dups
-  const duplicate = await FeedBack.findOne({ username }).lean().exec();
-  if (duplicate && duplicate?._id.toString() !== id) {
-    return res.status(409).json({ message: "duplicate username" });
-  }
+  // const duplicate = await FeedBack.findOne({ username }).lean().exec();
+  // if (duplicate && duplicate?._id.toString() !== id) {
+  //   return res.status(409).json({ message: "duplicate username" });
+  // }
 
   feedbacks.message = message;
   feedbacks.username = username;
@@ -100,7 +97,7 @@ const deleteFeedback = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Feedback does not exist" });
   }
 
-  const result = await FeedBack.deleteOne();
+  const result = await feedbacks.deleteOne();
 
   return res.json(`Feedback ${result.username} has been deleted.`);
 });

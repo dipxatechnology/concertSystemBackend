@@ -177,7 +177,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User does not exist" });
   }
 
-  const result = await User.deleteOne();
+  const result = await user.deleteOne();
 
   return res.json(`User ${result.username} has been deleted.`);
 });
