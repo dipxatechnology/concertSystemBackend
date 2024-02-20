@@ -150,8 +150,14 @@ const updateConcert = asyncHandler(async (req, res) => {
   // Add the concert to the artist's list of concerts
   const artistObject = await Artist.findById(artist).exec();
   if (artistObject) {
-    artistObject.concert.push(updatedConcert._id);
-    await artistObject.save();
+    const existingConcertIndex = artistObject.concert.findIndex(
+      (concertId) => concertId.toString() === id
+    );
+
+    if (existingConcertIndex === -1) {
+      artistObject.concert.push(updatedConcert._id);
+      await artistObject.save();
+    }
   }
 
   return res.json({ message: `updated ${updatedConcert.title}` });

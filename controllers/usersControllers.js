@@ -27,7 +27,6 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(id)
-    .select("-password")
     .populate({
       path: "ticket",
       populate: {
@@ -66,7 +65,7 @@ const createUser = asyncHandler(async (req, res) => {
     !roles.length ||
     !profile ||
     !email ||
-    !phone_number || 
+    !phone_number ||
     !address ||
     !postcode ||
     !country
@@ -93,7 +92,7 @@ const createUser = asyncHandler(async (req, res) => {
     phone_number,
     address,
     postcode,
-    country
+    country,
   };
 
   //storing new user

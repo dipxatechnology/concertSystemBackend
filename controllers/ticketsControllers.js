@@ -42,6 +42,10 @@ const getTicketById = asyncHandler(async (req, res) => {
     .populate({
       path: "concert",
       model: "Concert",
+      populate: {
+        path: "artist",
+        model: "Artist",
+      },
     })
     .lean()
     .exec();

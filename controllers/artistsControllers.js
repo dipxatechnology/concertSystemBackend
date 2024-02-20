@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Artist = require("../models/Artist");
 const asyncHandler = require("express-async-handler");
 
@@ -71,18 +72,13 @@ const updateArtist = asyncHandler(async (req, res) => {
   const { id, username, roles, profile, genre, bio, social, concerts } =
     req.body;
 
-  //checks fields
-  if (
-    !id ||
-    !username ||
-    !roles ||
-    !profile ||
-    !genre ||
-    !bio ||
-    !social ||
-    !concerts
-  ) {
+  // checks fields
+  if (!id || !username || !roles || !profile || !genre || !bio || !social) {
     return res.status(400).json({ message: "all fields are required" });
+  }
+
+  if (typeof concerts !== 'undefined' && !Array.isArray(concerts)) {
+    return res.status(400).json({ message: "concerts must be an array" });
   }
 
   const artist = await Artist.findById(id).exec();
