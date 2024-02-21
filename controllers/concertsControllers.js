@@ -45,6 +45,7 @@ const createConcert = asyncHandler(async (req, res) => {
     price,
     description,
     venue,
+    seats,
   } = req.body;
 
   if (
@@ -58,7 +59,8 @@ const createConcert = asyncHandler(async (req, res) => {
     !artist ||
     !price ||
     !description ||
-    !venue
+    !venue ||
+    !seats
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -76,6 +78,7 @@ const createConcert = asyncHandler(async (req, res) => {
       price,
       description,
       venue,
+      seats
     });
 
     // Update the artist's concerts array
@@ -106,6 +109,7 @@ const updateConcert = asyncHandler(async (req, res) => {
     description,
     state,
     profile,
+    seats,
   } = req.body;
 
   // checks fields
@@ -121,7 +125,8 @@ const updateConcert = asyncHandler(async (req, res) => {
     !artist ||
     !price ||
     !state ||
-    !profile
+    !profile || 
+    !seats
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -143,6 +148,7 @@ const updateConcert = asyncHandler(async (req, res) => {
   concert.price = price;
   concert.state = state;
   concert.profile = profile;
+  concert.seats = seats;
 
   // Save the updated concert
   const updatedConcert = await concert.save();

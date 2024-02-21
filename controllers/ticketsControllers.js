@@ -1,5 +1,6 @@
 const Ticket = require("../models/Ticket");
 const User = require("../models/User");
+const Concert = require("../models/Concert")
 const asyncHandler = require("express-async-handler");
 
 const getAllTickets = asyncHandler(async (req, res) => {
@@ -69,6 +70,11 @@ const createTicket = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
+  const concertDetails = await Concert.findById(concert);
+  if (!concertDetails) {
+    return res.status(400).json({ message: "Concert not found" });
+  }
+
   const ticketObject = {
     status,
     concert,
@@ -81,6 +87,9 @@ const createTicket = asyncHandler(async (req, res) => {
 
   existingUser.ticket.push(tickets._id);
   await existingUser.save();
+
+  concertDetails.seats -= quantity;
+  await concertDetails.save();
 
   if (tickets) {
     return res.status(201).json({ message: "New ticket created" });

@@ -48,6 +48,10 @@ const concertSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  seats: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Concert = mongoose.model("Concert", concertSchema);
