@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
 const login = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, rememberMe } = req.body;
+
+  const refreshTokenExpiration = rememberMe ? "7d" : "1d";
 
   if (!username || !password) {
     return res.status(400).json({ message: "All fields are required" });
@@ -34,18 +36,19 @@ const login = asyncHandler(async (req, res) => {
   const refreshToken = jwt.sign(
     { username: foundUser.username },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: refreshTokenExpiration }
   );
 
-  res.cookie("jwt", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("jwt", refreshToken, {
+  //   httpOnly: false,
+  //   secure: false,
+  //   sameSite: "None",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  // });
 
   res.json({
     accessToken,
+    refreshToken,
     userData: {
       _id: foundUser._id,
       username: foundUser.username,
@@ -87,14 +90,24 @@ const refresh = (req, res) => {
         { expiresIn: "1d" }
       );
 
-      res.json({ accessToken });
+      res.json({
+        accessToken,
+        userData: {
+          _id: foundUser._id,
+          username: foundUser.username,
+          phone_number: foundUser.phone_number,
+          roles: foundUser.roles,
+          profile: foundUser.profile,
+          ticket: foundUser.ticket,
+        },
+      });
     })
   );
 };
 
 const logout = (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(204); 
+  if (!cookies?.jwt) return res.sendStatus(204);
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
   res.json({ message: "Cookie cleared" });
 };
