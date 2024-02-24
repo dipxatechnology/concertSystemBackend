@@ -117,6 +117,8 @@ const updateUser = asyncHandler(async (req, res) => {
     country,
     roles,
     profile,
+    ticket,
+    date,
   } = req.body;
 
   //checks fields
@@ -131,7 +133,9 @@ const updateUser = asyncHandler(async (req, res) => {
     !Array.isArray(roles) ||
     !roles.length ||
     !password ||
-    !profile
+    !profile ||
+    !ticket ||
+    !date
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
@@ -157,6 +161,8 @@ const updateUser = asyncHandler(async (req, res) => {
   user.password = password;
   user.profile = profile;
   user.roles = roles;
+  user.ticket = ticket;
+  user.date = date;
 
   if (password) {
     user.password = await bcrypt.hash(password, 10);
