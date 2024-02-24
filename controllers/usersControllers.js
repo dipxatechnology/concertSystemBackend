@@ -115,6 +115,7 @@ const updateUser = asyncHandler(async (req, res) => {
     address,
     postcode,
     country,
+    roles,
     profile,
   } = req.body;
 
@@ -127,6 +128,8 @@ const updateUser = asyncHandler(async (req, res) => {
     !address ||
     !postcode ||
     !country ||
+    !Array.isArray(roles) ||
+    !roles.length ||
     !password ||
     !profile
   ) {
@@ -153,6 +156,7 @@ const updateUser = asyncHandler(async (req, res) => {
   user.country = country;
   user.password = password;
   user.profile = profile;
+  user.roles = roles;
 
   if (password) {
     user.password = await bcrypt.hash(password, 10);
