@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const getAllUsers = asyncHandler(async (req, res) => {
   try {
     const users = await User.find()
-      .select("-password")
+      // .select("-password")
       .populate("ticket")
       .lean();
 
@@ -81,11 +81,11 @@ const createUser = asyncHandler(async (req, res) => {
   }
 
   //hash pwds using salt rounds
-  const hashedPwd = await bcrypt.hash(password, 10);
+  // const hashedPwd = await bcrypt.hash(password, 10);
 
   const userObject = {
     username,
-    password: hashedPwd,
+    password,
     roles,
     profile,
     email,
@@ -163,9 +163,10 @@ const updateUser = asyncHandler(async (req, res) => {
   user.roles = roles;
   user.ticket = ticket;
   user.date = date;
+  user.password = password;
 
   if (password) {
-    user.password = await bcrypt.hash(password, 10);
+    // user.password = await bcrypt.hash(password, 10);
   }
   
   if (Array.isArray(roles) || !roles.length) {
