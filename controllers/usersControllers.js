@@ -130,10 +130,10 @@ const updateUser = asyncHandler(async (req, res) => {
     !address ||
     !postcode ||
     !country ||
-    // !Array.isArray(roles) ||
-    // !roles.length ||
+    !Array.isArray(roles) ||
+    !roles.length ||
     !password ||
-    !profile 
+    !profile
     // !ticket ||
     // !date
   ) {
@@ -167,10 +167,11 @@ const updateUser = asyncHandler(async (req, res) => {
   if (password) {
     user.password = await bcrypt.hash(password, 10);
   }
-
-  const updatedUser = await user.save();
-
-  return res.json({ message: `updated ${updatedUser.username}` });
+  
+  if (Array.isArray(roles) || !roles.length) {
+    const updatedUser = await user.save();
+    return res.json({ message: `updated ${updatedUser.username}` });
+  }
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
