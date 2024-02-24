@@ -130,12 +130,12 @@ const updateUser = asyncHandler(async (req, res) => {
     !address ||
     !postcode ||
     !country ||
-    !Array.isArray(roles) ||
-    !roles.length ||
+    // !Array.isArray(roles) ||
+    // !roles.length ||
     !password ||
-    !profile ||
-    !ticket ||
-    !date
+    !profile 
+    // !ticket ||
+    // !date
   ) {
     return res.status(400).json({ message: "all fields are required" });
   }
