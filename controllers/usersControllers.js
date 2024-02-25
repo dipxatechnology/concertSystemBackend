@@ -27,13 +27,20 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(id)
-    .populate({
-      path: "ticket",
-      populate: {
-        path: "concert",
-        model: "Concert",
+    .populate([
+      {
+        path: "ticket",
+        populate: [
+          {
+            path: "concert",
+            model: "Concert",
+          },
+          {
+            path: "date",
+          },
+        ],
       },
-    })
+    ])
     .lean()
     .exec();
 
@@ -81,11 +88,11 @@ const createUser = asyncHandler(async (req, res) => {
   }
 
   //hash pwds using salt rounds
-  // const hashedPwd = await bcrypt.hash(password, 10);
+  const hashedPwd = await bcrypt.hash(password, 10);
 
   const userObject = {
     username,
-    password,
+    password: hashedPwd,
     roles,
     profile,
     email,
@@ -133,8 +140,8 @@ const updateUser = asyncHandler(async (req, res) => {
     !Array.isArray(roles) ||
     !roles.length ||
     !password ||
-    !profile
-    // !ticket ||
+    !profile 
+    // !ticket 
     // !date
   ) {
     return res.status(400).json({ message: "all fields are required" });
@@ -163,12 +170,74 @@ const updateUser = asyncHandler(async (req, res) => {
   user.roles = roles;
   user.ticket = ticket;
   user.date = date;
-  user.password = password;
 
   if (password) {
-    // user.password = await bcrypt.hash(password, 10);
+    user.password = await bcrypt.hash(password, 10);
   }
-  
+
+  if (Array.isArray(roles) || !roles.length) {
+    const updatedUser = await user.save();
+    return res.json({ message: `updated ${updatedUser.username}` });
+  }
+});
+
+const updateUserInformation = asyncHandler(async (req, res) => {
+  // Extract other user information from the request body
+  const {
+    id,
+    username,
+    email,
+    phone_number,
+    address,
+    postcode,
+    country,
+    roles,
+    profile,
+    ticket,
+    date,
+  } = req.body;
+
+  //checks fields
+  if (
+    !id ||
+    !username ||
+    !email ||
+    !phone_number ||
+    !address ||
+    !postcode ||
+    !country ||
+    !Array.isArray(roles) ||
+    !roles.length ||
+    !profile 
+    // !ticket 
+    // !date
+  ) {
+    return res.status(400).json({ message: "all fields are required" });
+  }
+
+  const user = await User.findById(id).exec();
+
+  if (!user) {
+    return res.status(400).json({ message: "user not found" });
+  }
+
+  //checks dups
+  // const duplicate = await User.findOne({ username }).lean().exec();
+  // if (duplicate && duplicate?._id.toString() !== id) {
+  //   return res.status(409).json({ message: "duplicate username" });
+  // }
+
+  user.username = username;
+  user.email = email;
+  user.phone_number = phone_number;
+  user.address = address;
+  user.postcode = postcode;
+  user.country = country;
+  user.profile = profile;
+  user.roles = roles;
+  user.ticket = ticket;
+  user.date = date;
+
   if (Array.isArray(roles) || !roles.length) {
     const updatedUser = await user.save();
     return res.json({ message: `updated ${updatedUser.username}` });
@@ -199,4 +268,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  updateUserInformation
 };

@@ -29,6 +29,7 @@ app.use("/", require("./routes/root"));
 
 app.use('/auth', require('./routes/authRoutes'))
 app.use('/users', require('./routes/userRoutes'))
+app.use("/adminUpdate", require("./routes/adminUpdateRoutes"))
 app.use('/createUser', require('./routes/userCreateRoute'))
 app.use('/tickets', require('./routes/ticketRoutes'))
 app.use('/concerts', require('./routes/concertRoutes'))
